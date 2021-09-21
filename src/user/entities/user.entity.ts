@@ -1,11 +1,14 @@
-import { IsEmail } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  BeforeInsert,
+  BeforeUpdate,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class User {
@@ -23,11 +26,11 @@ export class User {
   email: string;
 
   @Column({ name: 'phone', type: 'varchar', nullable: false })
-  @IsEmail()
+  @IsString()
   phone: string;
 
-  @Column({ name: 'password', type: 'varchar', nullable: false })
-  @IsEmail()
+  @Column({ name: 'password', type: 'varchar', nullable: false, select: false })
+  @IsString()
   password: string;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -38,4 +41,12 @@ export class User {
 
   @Column({ name: 'deleted_at', nullable: true })
   deletedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+  }
 }
