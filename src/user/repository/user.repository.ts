@@ -1,9 +1,12 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
+import { Logger } from '@nestjs/common';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
+  private readonly log = new Logger('User');
+
   async createUser(payload: CreateUserDto): Promise<Partial<User>> {
     try {
       const email = payload.email;
@@ -14,7 +17,7 @@ export class UserRepository extends Repository<User> {
 
       if (existUser) {
         //TODO: replace that
-        throw new Error('Ya existe');
+        this.log.error('Este usuario ya existe');
       }
 
       const newUser: User = this.create({ ...payload });
@@ -27,8 +30,7 @@ export class UserRepository extends Repository<User> {
         email: newUser.email,
       };
     } catch (error) {
-      //TODO: create logger and exceptions
-      console.error(error);
+      this.log.error(error);
     }
   }
 }

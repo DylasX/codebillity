@@ -83,3 +83,7 @@ use this on admin cmd
 net stop hns
 net start hns
 ```
+
+create migration
+
+npm run typeorm migration:generate -- -n CreateUserTable

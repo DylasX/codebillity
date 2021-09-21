@@ -1,18 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Logger, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repository/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {
-    //TODO: logger here
-  }
+  private readonly log = new Logger('User');
+
+  constructor(private readonly userRepository: UserRepository) {}
+
   async create(createUserDto: CreateUserDto) {
     try {
       return await this.userRepository.createUser(createUserDto);
     } catch (error) {
-      console.error(error);
+      this.log.error(error);
     }
   }
 
