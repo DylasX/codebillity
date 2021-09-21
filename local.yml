@@ -1,0 +1,38 @@
+version: '3'
+
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+
+services:
+  node: &node
+    build:
+      context: .
+      target: development
+      dockerfile: ./docker/local/node/Dockerfile
+    image: codebillity
+    depends_on:
+      - postgres
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    env_file:
+      - ./.env/.local/.node
+      - ./.env/.local/.postgres
+    ports:
+      - 3000:3000
+      - 9229:9229
+    command: npm run start:debug
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./docker/local/postgresql/Dockerfile
+    image: codebillity-db
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - ./.env/.local/.postgres
+    ports:
+      - '5438:5432'
