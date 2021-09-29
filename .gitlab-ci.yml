@@ -6,7 +6,7 @@ stages:          # List of stages for jobs, and their order of execution
   - deploy
 
 build-pre-job:       # This job runs in the build stage, which runs first.
-  stage: build
+  stage: .pre
   script:
     - echo "Compiling the code..."
     - npm i
