@@ -1,24 +1,41 @@
-import { Logger, Injectable } from '@nestjs/common';
+import { Logger, Injectable, HttpStatus } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repository/user.repository';
+import { ServiceError } from '../commons/errors/customService.error';
 
 @Injectable()
 export class UserService {
-  private readonly log = new Logger('User');
-
   constructor(private readonly userRepository: UserRepository) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
-      return await this.userRepository.createUser(createUserDto);
+      const exist = await this.findByEmail(createUserDto.email);
+      if (exist) {
+        throw new ServiceError({
+          message: 'User already exist with that email',
+          code: HttpStatus.CONFLICT,
+        });
+      }
+      return this.userRepository.createUser(createUserDto);
     } catch (error) {
-      this.log.error(error);
+      throw error;
     }
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.userRepository.find();
+  }
+
+  findByEmail(email: string) {
+    return this.userRepository.findOne({ email });
+  }
+
+  findCredentialsLogin(email: string) {
+    return this.userRepository.findOne({
+      select: ['id', 'email', 'password'],
+      where: { email },
+    });
   }
 
   findOne(id: number) {

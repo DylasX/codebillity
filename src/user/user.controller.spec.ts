@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { UserRepository } from './__mocks__/user.repository';
 import { UserService } from './user.service';
 import { TransformInterceptor } from '../commons/interceptors/transform.interceptor';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 jest.mock('./user.service.ts');
 
 describe('UserController', () => {
@@ -18,6 +19,7 @@ describe('UserController', () => {
         UserService,
         { provide: getRepositoryToken(User), useClass: UserRepository },
         TransformInterceptor,
+        JwtAuthGuard,
       ],
       imports: [],
     }).compile();

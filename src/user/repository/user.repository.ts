@@ -9,17 +9,6 @@ export class UserRepository extends Repository<User> {
 
   async createUser(payload: CreateUserDto): Promise<Partial<User>> {
     try {
-      const email = payload.email;
-
-      const existUser = await this.findOne({
-        where: [{ email }],
-      });
-
-      if (existUser) {
-        //TODO: replace that
-        this.log.error('Este usuario ya existe');
-      }
-
       const newUser: User = this.create({ ...payload });
 
       await this.save(newUser);

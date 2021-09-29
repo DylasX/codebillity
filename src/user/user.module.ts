@@ -9,5 +9,6 @@ import { TransformInterceptor } from './../commons/interceptors/transform.interc
   imports: [TypeOrmModule.forFeature([UserRepository])],
   controllers: [UserController],
   providers: [UserService, TransformInterceptor],
+  exports: [UserService],
 })
 export class UserModule {}

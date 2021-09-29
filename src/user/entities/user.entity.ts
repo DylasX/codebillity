@@ -21,7 +21,7 @@ export class User {
   @Column({ name: 'last_name', type: 'varchar', nullable: false })
   lastName: string;
 
-  @Column({ name: 'email', type: 'varchar', nullable: false })
+  @Column({ name: 'email', type: 'varchar', nullable: false, unique: true })
   @IsEmail()
   email: string;
 
@@ -39,7 +39,7 @@ export class User {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @Column({ name: 'deleted_at', nullable: true })
+  @Column({ name: 'deleted_at', nullable: true, select: false })
   deletedAt: Date;
 
   @BeforeInsert()
@@ -48,5 +48,9 @@ export class User {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, 10);
     }
+  }
+
+  async validatePassword(password: string): Promise<boolean> {
+    return await bcrypt.compareSync(password, this.password);
   }
 }
