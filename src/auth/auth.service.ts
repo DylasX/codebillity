@@ -12,9 +12,11 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.userService.findCredentialsLogin(email);
+    if (!user) {
+      return null;
+    }
     const validatedUser = await user.validatePassword(password);
-
-    if (user && validatedUser) {
+    if (validatedUser) {
       return user;
     }
 
