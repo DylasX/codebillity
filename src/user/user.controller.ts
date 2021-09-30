@@ -76,6 +76,6 @@ export class UserController {
   @UseInterceptors(TransformInterceptor)
   async remove(@Param('id', ParseIntPipe, IdSearchUser) id: number) {
     const deleted = await this.userService.remove(id);
-    return { result: deleted, message: 'User deleted' };
+    return { result: !!deleted.affected, message: 'User deleted' };
   }
 }
