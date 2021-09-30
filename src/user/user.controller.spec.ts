@@ -6,7 +6,9 @@ import { UserRepository } from './__mocks__/user.repository';
 import { UserService } from './user.service';
 import { TransformInterceptor } from '../commons/interceptors/transform.interceptor';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { IdSearchUser } from './pipes/id-search.pipe';
 jest.mock('./user.service.ts');
+jest.mock('./pipes/id-search.pipe');
 
 describe('UserController', () => {
   let controller: UserController;
@@ -20,6 +22,7 @@ describe('UserController', () => {
         { provide: getRepositoryToken(User), useClass: UserRepository },
         TransformInterceptor,
         JwtAuthGuard,
+        IdSearchUser,
       ],
       imports: [],
     }).compile();

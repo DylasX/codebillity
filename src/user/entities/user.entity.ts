@@ -7,6 +7,7 @@ import {
   BeforeUpdate,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -39,7 +40,7 @@ export class User {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @Column({ name: 'deleted_at', nullable: true, select: false })
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true, select: false })
   deletedAt: Date;
 
   @BeforeInsert()

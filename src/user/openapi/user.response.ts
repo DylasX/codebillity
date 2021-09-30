@@ -4,7 +4,7 @@ export const createUser = {
   schema: {
     type: 'object',
     properties: {
-      statuscode: {
+      statusCode: {
         type: 'number',
         description: 'Http Code',
         default: 201,
@@ -49,7 +49,7 @@ export const getAllUsers = {
   schema: {
     type: 'object',
     properties: {
-      statuscode: {
+      statusCode: {
         type: 'number',
         description: 'Http Code',
         default: 200,

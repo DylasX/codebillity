@@ -1,26 +1,19 @@
-import { Logger, Injectable, HttpStatus } from '@nestjs/common';
+import { Logger, Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { Not } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repository/user.repository';
-import { ServiceError } from '../commons/errors/customService.error';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const exist = await this.findByEmail(createUserDto.email);
-      if (exist) {
-        throw new ServiceError({
-          message: 'User already exist with that email',
-          code: HttpStatus.CONFLICT,
-        });
-      }
-      return this.userRepository.createUser(createUserDto);
-    } catch (error) {
-      throw error;
+    const exist = await this.findByEmail(createUserDto.email);
+    if (exist) {
+      throw new HttpException('Email already exist', HttpStatus.CONFLICT);
     }
+    return this.userRepository.createUser(createUserDto);
   }
 
   findAll() {
@@ -44,11 +37,18 @@ export class UserService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const exist = await this.userRepository.findOne({
+      where: { email: updateUserDto.email, id: Not(id) },
+    });
+    if (exist) {
+      throw new HttpException('New email already exist', HttpStatus.CONFLICT);
+    }
+    //TODO: check changes before send it to update
+    return this.userRepository.updateUser(id, updateUserDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.userRepository.softDelete({ id });
   }
 }
