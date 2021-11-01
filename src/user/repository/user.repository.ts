@@ -23,9 +23,15 @@ export class UserRepository extends Repository<User> {
     id: number,
     payload: UpdateUserDto,
   ): Promise<Partial<User[]>> {
-    const cryptedPassword = await bcrypt.hash(payload.password, 10);
+    let cryptedPassword;
+    let updateWithPassword = { ...payload };
+    if (payload.password) {
+      cryptedPassword = await bcrypt.hash(payload.password, 10);
+      updateWithPassword = { ...payload, password: cryptedPassword };
+    }
+
     const userRow = await this.createQueryBuilder()
-      .update(User, { ...payload, password: cryptedPassword })
+      .update(User, updateWithPassword)
       .where('id = :id', { id })
       .returning('name, last_name, email')
       .updateEntity(true)
