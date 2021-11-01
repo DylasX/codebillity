@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { TypeORMExceptionFilter } from './commons/exceptions/typeorm-exceptions.filter';
 import { AllExceptionsFilter } from './commons/exceptions/all-exception.filter';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,6 +31,8 @@ async function bootstrap() {
   app.useGlobalFilters(new TypeORMExceptionFilter());
   app.useGlobalFilters(new AllExceptionsFilter());
   app.enableCors();
+  app.use(cookieParser('cookiesecret'));
+
   await app.listen(3000);
 }
 bootstrap();

@@ -4,9 +4,10 @@ import {
   UseGuards,
   Request,
   Get,
-  Body,
+  HttpCode,
   UseInterceptors,
   Logger,
+  Res,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
@@ -15,7 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LoginDto } from './auth.dto';
 import { TransformInterceptor } from '../commons/interceptors/transform.interceptor';
-
+import { decrypt, encrypt } from '../commons/crypto/crypter';
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
@@ -30,18 +31,34 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @ApiBody({ type: LoginDto })
   @UseInterceptors(TransformInterceptor)
+  @HttpCode(200)
   @Post('login')
-  async login(@Request() request) {
+  async login(@Request() request, @Res() res) {
     const user = request.user;
     delete user.password;
     const { access_token } = await this.authService.createToken(request.user);
-    return { result: { ...user, access_token }, message: 'User login' };
+    const ip = request.ip;
+    const cryptedToken = encrypt(access_token, {
+      key: `SecretHashPassword${ip}ToCookie`,
+    });
+    res.cookie('user', cryptedToken, {
+      maxAge: 900000,
+      httpOnly: true,
+      secure: true,
+    });
+    return res.send({
+      statusCode: 200,
+      message: 'User login',
+    });
   }
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('access-token')
   @Get('profile')
   getProfile(@Request() req) {
+    const ip = req.ip;
+    console.log(req.cookies);
+    console.log(
+      decrypt(req.cookies.user, { key: `SecretHashPassword${ip}ToCookie` }),
+    );
     return req.user;
   }
 }
