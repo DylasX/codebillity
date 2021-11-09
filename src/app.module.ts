@@ -9,7 +9,7 @@ import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['./.env/.local/.node', './.env/.production/.node'],
+      envFilePath: ['./.envs/.local/.node', './.envs/.production/.node'],
       isGlobal: true,
       validationSchema: Joi.object({
         POSTGRES_HOST: Joi.string().required(),
