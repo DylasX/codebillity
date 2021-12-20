@@ -1,19 +1,31 @@
 import { Logger, Injectable, HttpStatus, HttpException } from '@nestjs/common';
-import { Not } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Not, Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role } from './entities/role.entity';
+import RoleEnum from './enums/role.enum';
 import { UserRepository } from './repository/user.repository';
+import { UserCreation } from './types/user.types';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
+    private readonly _logger: Logger,
+  ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const exist = await this.findByEmail(createUserDto.email);
+  async create(userPayload: UserCreation) {
+    const exist = await this.findByEmail(userPayload.email);
     if (exist) {
       throw new HttpException('Email already exist', HttpStatus.CONFLICT);
     }
-    return this.userRepository.createUser(createUserDto);
+    const defaultRole = await this.roleRepository.findOne({
+      name: RoleEnum.User,
+    });
+    if (defaultRole) userPayload.roles = [defaultRole];
+    return this.userRepository.createUser(userPayload);
   }
 
   findAll() {
@@ -21,7 +33,10 @@ export class UserService {
   }
 
   findByEmail(email: string) {
-    return this.userRepository.findOne({ email });
+    return this.userRepository.findOne({
+      where: { email },
+      relations: ['roles'],
+    });
   }
 
   findCredentialsLogin(email: string) {
@@ -34,6 +49,7 @@ export class UserService {
   findOne(id: number) {
     return this.userRepository.findOne({
       where: { id },
+      relations: ['roles'],
     });
   }
 

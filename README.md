@@ -87,3 +87,8 @@ net start hns
 create migration
 
 npm run typeorm migration:generate -- -n CreateUserTable
+
+Start docker only db
+docker-compose -f local.yml up -d postgres
+
+Docker scripts db to backup and restore on cookiecutter documentation

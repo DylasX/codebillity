@@ -8,8 +8,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  JoinTable,
+  ManyToMany,
+  getConnection,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Role } from './role.entity';
 
 @Entity()
 export class User {
@@ -43,6 +47,10 @@ export class User {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true, select: false })
   deletedAt: Date;
 
+  @ManyToMany(() => Role, { cascade: true })
+  @JoinTable()
+  roles: Role[];
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
@@ -53,5 +61,15 @@ export class User {
 
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compareSync(password, this.password);
+  }
+
+  async getRoles(id): Promise<string[]> {
+    const userRepo = await getConnection().getRepository(User);
+    const user = await userRepo.findOne({
+      relations: ['roles'],
+      where: { id },
+    });
+    const roles = await user.roles.map((role) => role.name);
+    return roles;
   }
 }

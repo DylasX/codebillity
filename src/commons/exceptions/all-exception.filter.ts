@@ -22,7 +22,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const filterResponse: customError = {
       statusCode: status,
       date: new Date().toISOString(),
-      message: exception.message,
+      message:
+        process.env.NODE_ENV !== 'production'
+          ? exception.message
+          : 'Server Error',
     };
 
     response.status(status).json(filterResponse);

@@ -29,6 +29,7 @@ describe('UserController', () => {
 
     controller = module.get<UserController>(UserController);
     userService = module.get<UserService>(UserService);
+    console.log(userService);
   });
 
   it('should be defined', () => {

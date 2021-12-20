@@ -1,15 +1,15 @@
-import { EntityRepository, Repository, UpdateResult } from 'typeorm';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { EntityRepository, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { HttpException, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { UserCreation } from '../types/user.types';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
   private readonly log = new Logger('User');
 
-  async createUser(payload: CreateUserDto): Promise<Partial<User>> {
+  async createUser(payload: UserCreation): Promise<Partial<User>> {
     const newUser: User = this.create({ ...payload });
     await this.save(newUser);
     return {

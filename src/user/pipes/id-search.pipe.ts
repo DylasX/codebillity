@@ -15,7 +15,7 @@ export class IdSearchUser implements PipeTransform {
     public userRepository: Repository<UserRepository>,
   ) {}
 
-  async transform(value: any, metadata: ArgumentMetadata) {
+  async transform(value: any, _metadata: ArgumentMetadata) {
     try {
       await this.userRepository.findOneOrFail(value);
     } catch (err) {

@@ -4,8 +4,11 @@ import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
+import { Role } from './user/entities/role.entity';
 import { AuthModule } from './auth/auth.module';
-
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './permissions/roles.guard';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,7 +32,7 @@ import { AuthModule } from './auth/auth.module';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [User],
+        entities: [User, Role],
         synchronize: false,
       }),
     }),
@@ -37,6 +40,15 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -5,9 +5,10 @@ import { UserRepository } from './repository/user.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransformInterceptor } from './../commons/interceptors/transform.interceptor';
 import { IdSearchUser } from './pipes/id-search.pipe';
+import { Role } from './entities/role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserRepository])],
+  imports: [TypeOrmModule.forFeature([UserRepository, Role])],
   controllers: [UserController],
   providers: [UserService, TransformInterceptor, IdSearchUser],
   exports: [UserService],

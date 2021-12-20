@@ -24,6 +24,9 @@ import {
 } from '@nestjs/swagger';
 import { createUser, getAllUsers } from './openapi/user.response';
 import { IdSearchUser } from './pipes/id-search.pipe';
+import { Roles } from '../permissions/roles.decorator';
+import RoleEnum from './enums/role.enum';
+import { BypassAuth } from 'src/auth/bypass-auth.decorator';
 
 @Controller('user')
 @ApiTags('User')
@@ -46,6 +49,7 @@ export class UserController {
   @UseInterceptors(TransformInterceptor)
   @ApiResponse(getAllUsers)
   @ApiOperation({ summary: 'Find all users' })
+  @Roles(RoleEnum.Admin)
   @Get()
   async findAll() {
     const users = await this.userService.findAll();
@@ -54,6 +58,7 @@ export class UserController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Find user' })
+  @BypassAuth()
   @UseInterceptors(TransformInterceptor)
   async findOne(@Param('id', ParseIntPipe, IdSearchUser) id: number) {
     const user = await this.userService.findOne(id);
