@@ -1,4 +1,4 @@
-import { Logger, Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -13,7 +13,6 @@ export class UserService {
     private readonly userRepository: UserRepository,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
-    private readonly _logger: Logger,
   ) {}
 
   async create(userPayload: UserCreation) {
