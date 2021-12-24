@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,8 +9,19 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './permissions/roles.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import * as redisStore from 'cache-manager-redis-store';
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get('REDIS_HOST'),
+        port: configService.get<number>('REDIS_PORT'),
+      }),
+    }),
     ConfigModule.forRoot({
       envFilePath: ['./.envs/.local/.node', './.envs/.production/.node'],
       isGlobal: true,
@@ -20,6 +31,8 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
         POSTGRES_PORT: Joi.string().required(),
         POSTGRES_USER: Joi.string().required(),
         POSTGRES_PASSWORD: Joi.string().required(),
+        REDIS_PORT: Joi.string().required(),
+        REDIS_HOST: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRootAsync({

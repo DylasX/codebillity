@@ -10,6 +10,9 @@ import {
   Logger,
   UseGuards,
   ParseIntPipe,
+  CacheInterceptor,
+  CacheTTL,
+  CacheKey,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -59,7 +62,8 @@ export class UserController {
   @Get(':id')
   @ApiOperation({ summary: 'Find user' })
   @BypassAuth()
-  @UseInterceptors(TransformInterceptor)
+  @UseInterceptors(TransformInterceptor, CacheInterceptor)
+  @CacheTTL(20)
   async findOne(@Param('id', ParseIntPipe, IdSearchUser) id: number) {
     const user = await this.userService.findOne(id);
     return { result: user, message: 'Users retrieved' };

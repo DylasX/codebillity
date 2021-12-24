@@ -5,23 +5,23 @@ volumes:
   local_postgres_data_backups: {}
 
 services:
-  node: &node
-    build:
-      context: .
-      target: development
-      dockerfile: ./docker/local/node/Dockerfile
-    image: codebillity
-    depends_on:
-      - postgres
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    env_file:
-      - ./.envs/.local/.node
-    ports:
-      - 3000:3000
-      - 9229:9229
-    command: npm run start:debug
+  # node: &node
+  #   build:
+  #     context: .
+  #     target: development
+  #     dockerfile: ./docker/local/node/Dockerfile
+  #   image: codebillity
+  #   depends_on:
+  #     - postgres
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   env_file:
+  #     - ./.envs/.local/.node
+  #   ports:
+  #     - 3000:3000
+  #     - 9229:9229
+  #   command: npm run start:debug
 
   postgres:
     build:
@@ -35,3 +35,8 @@ services:
       - ./.envs/.local/.postgres
     ports:
       - '5432:5432'
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379

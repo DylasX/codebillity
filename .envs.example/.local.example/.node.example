@@ -1,0 +1,13 @@
+PORT=3000
+NODE_ENV=development
+JWT_SECRET=codebillityJWTS3cr3t
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=codebillity
+POSTGRES_USER=root
+POSTGRES_PASSWORD=123
+
+REDIS_PORT = 6379
+REDIS_HOST = localhost
