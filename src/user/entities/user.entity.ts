@@ -11,12 +11,13 @@ import {
   JoinTable,
   ManyToMany,
   getConnection,
+  BaseEntity,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Role } from './role.entity';
 
 @Entity()
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -44,7 +45,7 @@ export class User {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true, select: false })
+  @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
 
   @ManyToMany(() => Role, { cascade: true })

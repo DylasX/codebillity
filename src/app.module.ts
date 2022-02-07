@@ -1,15 +1,30 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { User } from './user/entities/user.entity';
-import { Role } from './user/entities/role.entity';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './permissions/roles.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import * as redisStore from 'cache-manager-redis-store';
+import { DatabaseModule } from './database/database.module';
+import { AdminModule } from '@adminjs/nestjs';
+import { Database, Resource } from '@adminjs/typeorm';
+import { User } from './user/entities/user.entity';
+import AdminJS, { CurrentAdmin } from 'adminjs';
+
+AdminJS.registerAdapter({ Database, Resource });
+//TODO: enable soft delete
+// AdminJS.ACTIONS.delete.handler = async (request, response, data) => {
+//   if (!request.params.recordId || !record) {
+//     throw new NotFoundError(
+//       ['You have to pass "recordId" to Delete Action'].join('\n'),
+//       'Action#handler',
+//     );
+//   }
+// };
+
+//TODO: implement express-session with redis
 @Module({
   imports: [
     CacheModule.registerAsync({
@@ -35,22 +50,32 @@ import * as redisStore from 'cache-manager-redis-store';
         REDIS_HOST: Joi.string().required(),
       }),
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('POSTGRES_HOST'),
-        port: configService.get<number>('POSTGRES_PORT'),
-        username: configService.get('POSTGRES_USER'),
-        password: configService.get('POSTGRES_PASSWORD'),
-        database: configService.get('POSTGRES_DB'),
-        entities: [User, Role],
-        synchronize: false,
-      }),
-    }),
+    DatabaseModule,
     UserModule,
     AuthModule,
+    AdminModule.createAdminAsync({
+      useFactory: () => ({
+        adminJsOptions: {
+          rootPath: '/admin',
+          resources: [User],
+        },
+        auth: {
+          authenticate: async (email, password) => {
+            const userModel = User.getRepository();
+            const user = await userModel.findOne({
+              select: ['id', 'email', 'password'],
+              where: { email },
+            });
+            const isValid = await user.validatePassword(password);
+            if (!isValid) return;
+
+            return user as any as CurrentAdmin;
+          },
+          cookieName: 'adminBro',
+          cookiePassword: 'adminBro',
+        },
+      }),
+    }),
   ],
   controllers: [],
   providers: [
