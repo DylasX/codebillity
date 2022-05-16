@@ -30,6 +30,6 @@ async function bootstrap() {
   app.useGlobalFilters(new TypeORMExceptionFilter());
   app.useGlobalFilters(new AllExceptionsFilter());
   app.enableCors();
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
