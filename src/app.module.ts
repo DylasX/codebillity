@@ -12,6 +12,7 @@ import { AdminModule } from '@adminjs/nestjs';
 import { Database, Resource } from '@adminjs/typeorm';
 import { User } from './user/entities/user.entity';
 import AdminJS, { CurrentAdmin } from 'adminjs';
+import RoleEnum from './user/enums/role.enum';
 
 AdminJS.registerAdapter({ Database, Resource });
 //TODO: enable soft delete
@@ -67,8 +68,9 @@ AdminJS.registerAdapter({ Database, Resource });
               where: { email },
             });
             const isValid = await user.validatePassword(password);
-            if (!isValid) return;
-
+            const roles = await user.getRoles();
+            if (!isValid || !roles.some((role) => role === RoleEnum.Admin))
+              return;
             return user as any as CurrentAdmin;
           },
           cookieName: 'adminBro',

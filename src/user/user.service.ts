@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './entities/role.entity';
+import { User } from './entities/user.entity';
 import RoleEnum from './enums/role.enum';
 import { UserRepository } from './repository/user.repository';
 import { UserCreation } from './types/user.types';
@@ -23,8 +24,10 @@ export class UserService {
     const defaultRole = await this.roleRepository.findOne({
       name: RoleEnum.User,
     });
-    if (defaultRole) userPayload.roles = [defaultRole];
-    return this.userRepository.createUser(userPayload);
+    if (defaultRole) userPayload.roles = Promise.resolve([defaultRole]);
+    const user: User = new User(userPayload);
+    // cant use user.save because there is a bug in typeorm returning all columns
+    return user.save();
   }
 
   findAll() {

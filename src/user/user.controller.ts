@@ -40,6 +40,7 @@ export class UserController {
   @Post()
   @UseInterceptors(TransformInterceptor)
   @ApiResponse(createUser)
+  @BypassAuth()
   @ApiOperation({ summary: 'Create user' })
   async create(@Body() createUserDto: CreateUserDto) {
     const newUser = await this.userService.create(createUserDto);

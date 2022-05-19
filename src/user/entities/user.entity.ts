@@ -10,7 +10,6 @@ import {
   DeleteDateColumn,
   JoinTable,
   ManyToMany,
-  getConnection,
   BaseEntity,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -18,6 +17,18 @@ import { Role } from './role.entity';
 
 @Entity()
 export class User extends BaseEntity {
+  constructor(user?: Partial<User>) {
+    super();
+    if (user) {
+      this.name = user.name;
+      this.lastName = user.lastName;
+      this.email = user.email;
+      this.password = user.password;
+      this.roles = user.roles;
+      this.phone = user.phone;
+    }
+  }
+
   @PrimaryGeneratedColumn('increment')
   id: number;
 
@@ -50,7 +61,7 @@ export class User extends BaseEntity {
 
   @ManyToMany(() => Role, { cascade: true })
   @JoinTable()
-  roles: Role[];
+  roles: Promise<Role[]>;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -64,13 +75,8 @@ export class User extends BaseEntity {
     return await bcrypt.compareSync(password, this.password);
   }
 
-  async getRoles(id): Promise<string[]> {
-    const userRepo = await getConnection().getRepository(User);
-    const user = await userRepo.findOne({
-      relations: ['roles'],
-      where: { id },
-    });
-    const roles = await user.roles.map((role) => role.name);
-    return roles;
+  async getRoles(): Promise<string[]> {
+    const roles = await this.roles;
+    return roles.map((role) => role.name);
   }
 }

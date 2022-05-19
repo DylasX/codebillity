@@ -6,8 +6,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToMany,
 } from 'typeorm';
 import RoleEnum from '../enums/role.enum';
+import { User } from './user.entity';
 
 @Entity()
 export class Role {
@@ -32,4 +34,7 @@ export class Role {
 
   @DeleteDateColumn({ name: 'deleted_at', nullable: true, select: false })
   deletedAt: Date;
+
+  @ManyToMany(() => User, (user) => user.roles)
+  users: Promise<User[]>;
 }
