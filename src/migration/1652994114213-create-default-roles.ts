@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class createDefaultrole1652944114216 implements MigrationInterface {
-  name = 'createDefaultrole1652944114216';
+export class createDefaultrole1652994114213 implements MigrationInterface {
+  name = 'createDefaultrole1652994114213';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(

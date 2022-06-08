@@ -21,7 +21,7 @@ export class UserService {
     if (exist) {
       throw new HttpException('Email already exist', HttpStatus.CONFLICT);
     }
-    const defaultRole = await this.roleRepository.findOne({
+    const defaultRole = await this.roleRepository.findOneBy({
       name: RoleEnum.User,
     });
     if (defaultRole) userPayload.roles = Promise.resolve([defaultRole]);
