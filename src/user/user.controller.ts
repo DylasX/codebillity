@@ -27,7 +27,7 @@ import {
 import { createUser, getAllUsers } from './openapi/user.response';
 import { IdSearchUser } from './pipes/id-search.pipe';
 import { Roles } from '../permissions/roles.decorator';
-import RoleEnum from './enums/role.enum';
+import RoleEnum from './role/enums/role.enum';
 import { BypassAuth } from 'src/auth/bypass-auth.decorator';
 
 @Controller('user')
@@ -76,7 +76,7 @@ export class UserController {
     @Param('id', ParseIntPipe, IdSearchUser) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const [user] = await this.userService.update(id, updateUserDto);
+    const user = await this.userService.update(id, updateUserDto);
     return { result: user, message: 'User updated' };
   }
 

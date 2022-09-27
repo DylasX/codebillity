@@ -9,7 +9,7 @@ import {
   ManyToMany,
 } from 'typeorm';
 import RoleEnum from '../enums/role.enum';
-import { User } from './user.entity';
+import { User } from '../../entities/user.entity';
 
 @Entity()
 export class Role {

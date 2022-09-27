@@ -9,7 +9,7 @@ export const connectionSource = new DataSource({
   database: 'codebillity',
   synchronize: true,
   logging: false,
-  entities: ['src/**/entities/*.ts'],
+  entities: ['src/**/entities/*.{js,ts}', 'src/**/**/entities/*.ts'],
   migrations: ['src/migration/**/*.ts'],
   subscribers: ['src/subscriber/**/*.ts'],
 });

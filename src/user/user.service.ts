@@ -1,17 +1,17 @@
 import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Role } from './entities/role.entity';
 import { User } from './entities/user.entity';
-import RoleEnum from './enums/role.enum';
-import { UserRepository } from './repository/user.repository';
+import RoleEnum from './role/enums/role.enum';
 import { UserCreation } from './types/user.types';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from './role/entities/role.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly userRepository: UserRepository,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
   ) {}
@@ -63,7 +63,7 @@ export class UserService {
       throw new HttpException('New email already exist', HttpStatus.CONFLICT);
     }
     //TODO: check changes before send it to update
-    return this.userRepository.updateUser(id, updateUserDto);
+    return this.userRepository.update(id, updateUserDto);
   }
 
   remove(id: number) {

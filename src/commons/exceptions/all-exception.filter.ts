@@ -28,6 +28,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
           : 'Server Error',
     };
 
+    console.log(exception);
+
     response.status(status).json(filterResponse);
   }
 }

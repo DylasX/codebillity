@@ -15,7 +15,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { LoginDto } from './auth.dto';
 import { TransformInterceptor } from '../commons/interceptors/transform.interceptor';
 import { Roles } from 'src/permissions/roles.decorator';
-import RoleEnum from 'src/user/enums/role.enum';
+import RoleEnum from 'src/user/role/enums/role.enum';
 import { BypassAuth } from './bypass-auth.decorator';
 
 @Controller('auth')

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { UserRepository } from './repository/user.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransformInterceptor } from './../commons/interceptors/transform.interceptor';
 import { IdSearchUser } from './pipes/id-search.pipe';
-import { Role } from './entities/role.entity';
+import { User } from './entities/user.entity';
+import { Role } from './role/entities/role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserRepository, Role])],
+  imports: [TypeOrmModule.forFeature([User, Role])],
   controllers: [UserController],
   providers: [UserService, TransformInterceptor, IdSearchUser],
   exports: [UserService],

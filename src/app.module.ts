@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { RoleModule } from './user/role/role.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './permissions/roles.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -12,7 +13,8 @@ import { AdminModule } from '@adminjs/nestjs';
 import { Database, Resource } from '@adminjs/typeorm';
 import { User } from './user/entities/user.entity';
 import AdminJS, { CurrentAdmin } from 'adminjs';
-import RoleEnum from './user/enums/role.enum';
+import RoleEnum from './user/role/enums/role.enum';
+import { DataSource } from 'typeorm';
 
 AdminJS.registerAdapter({ Database, Resource });
 //TODO: enable soft delete
@@ -53,6 +55,7 @@ AdminJS.registerAdapter({ Database, Resource });
     }),
     DatabaseModule,
     UserModule,
+    RoleModule,
     AuthModule,
     AdminModule.createAdminAsync({
       useFactory: () => ({
@@ -91,4 +94,6 @@ AdminJS.registerAdapter({ Database, Resource });
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
