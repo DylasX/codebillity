@@ -57,6 +57,7 @@ AdminJS.registerAdapter({ Database, Resource });
     UserModule,
     RoleModule,
     AuthModule,
+    //TODO: This should be in a separated project with a string connection typeorm
     AdminModule.createAdminAsync({
       useFactory: () => ({
         adminJsOptions: {
