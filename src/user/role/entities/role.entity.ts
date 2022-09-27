@@ -7,12 +7,13 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToMany,
+  BaseEntity,
 } from 'typeorm';
 import RoleEnum from '../enums/role.enum';
 import { User } from '../../entities/user.entity';
 
 @Entity()
-export class Role {
+export class Role extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

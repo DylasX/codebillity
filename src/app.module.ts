@@ -14,7 +14,7 @@ import { Database, Resource } from '@adminjs/typeorm';
 import { User } from './user/entities/user.entity';
 import AdminJS, { CurrentAdmin } from 'adminjs';
 import RoleEnum from './user/role/enums/role.enum';
-import { DataSource } from 'typeorm';
+import { Role } from './user/role/entities/role.entity';
 
 AdminJS.registerAdapter({ Database, Resource });
 //TODO: enable soft delete
@@ -61,7 +61,7 @@ AdminJS.registerAdapter({ Database, Resource });
       useFactory: () => ({
         adminJsOptions: {
           rootPath: '/admin',
-          resources: [User],
+          resources: [User, Role],
         },
         auth: {
           authenticate: async (email, password) => {
@@ -94,6 +94,4 @@ AdminJS.registerAdapter({ Database, Resource });
     },
   ],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-}
+export class AppModule {}
