@@ -1,4 +1,10 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import {
+  CacheManagerOptions,
+  CacheModule,
+  CacheOptions,
+  CacheStore,
+} from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { UserModule } from './user/user.module';
@@ -9,33 +15,17 @@ import { RolesGuard } from './permissions/roles.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import * as redisStore from 'cache-manager-redis-store';
 import { DatabaseModule } from './database/database.module';
-import { AdminModule } from '@adminjs/nestjs';
-import { Database, Resource } from '@adminjs/typeorm';
-import { User } from './user/entities/user.entity';
-import AdminJS, { CurrentAdmin } from 'adminjs';
-import RoleEnum from './user/role/enums/role.enum';
-import { Role } from './user/role/entities/role.entity';
 
-AdminJS.registerAdapter({ Database, Resource });
-//TODO: enable soft delete
-// AdminJS.ACTIONS.delete.handler = async (request, response, data) => {
-//   if (!request.params.recordId || !record) {
-//     throw new NotFoundError(
-//       ['You have to pass "recordId" to Delete Action'].join('\n'),
-//       'Action#handler',
-//     );
-//   }
-// };
-
-//TODO: implement express-session with redis
 @Module({
   imports: [
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<CacheOptions<CacheManagerOptions & Record<string, any>>> => ({
+        store: redisStore as unknown as CacheStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get<number>('REDIS_PORT'),
       }),
@@ -57,31 +47,6 @@ AdminJS.registerAdapter({ Database, Resource });
     UserModule,
     RoleModule,
     AuthModule,
-    //TODO: This should be in a separated project with a string connection typeorm
-    AdminModule.createAdminAsync({
-      useFactory: () => ({
-        adminJsOptions: {
-          rootPath: '/admin',
-          resources: [User, Role],
-        },
-        auth: {
-          authenticate: async (email, password) => {
-            const userModel = User.getRepository();
-            const user = await userModel.findOne({
-              select: ['id', 'email', 'password'],
-              where: { email },
-            });
-            const isValid = await user.validatePassword(password);
-            const roles = await user.getRoles();
-            if (!isValid || !roles.some((role) => role === RoleEnum.Admin))
-              return;
-            return user as any as CurrentAdmin;
-          },
-          cookieName: 'adminBro',
-          cookiePassword: 'adminBro',
-        },
-      }),
-    }),
   ],
   controllers: [],
   providers: [

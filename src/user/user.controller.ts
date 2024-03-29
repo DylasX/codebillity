@@ -10,8 +10,6 @@ import {
   Logger,
   UseGuards,
   ParseIntPipe,
-  CacheInterceptor,
-  CacheTTL,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -29,6 +27,7 @@ import { IdSearchUser } from './pipes/id-search.pipe';
 import { Roles } from '../permissions/roles.decorator';
 import RoleEnum from './role/enums/role.enum';
 import { BypassAuth } from 'src/auth/bypass-auth.decorator';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('user')
 @ApiTags('User')
